@@ -1,10 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using DatingApp.API.Data;
+using DatingApp.API.Helpers;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +19,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 
 namespace DatingApp.API {
     public class Startup {
@@ -25,20 +33,53 @@ namespace DatingApp.API {
         public void ConfigureServices (IServiceCollection services) {
             services.AddControllers ();
             services.AddDbContext<DataContext> (options => options.UseSqlServer (Configuration.GetConnectionString ("DatingAppDatabase")));
-            // services.AddCors();  
+            
+            services.AddScoped<IDatingRepository, DatingRepository> ();
+            services.AddScoped<IAuthRepository, AuthRepository> ();
+            services.AddTransient<Seed>();
+            // // Add Cors
+            // services.AddCors (o => o.AddPolicy ("MyPolicy", builder => {
+            //     builder.AllowAnyOrigin ()
+            //         .AllowAnyMethod ()
+            //         .AllowAnyHeader ();
+            // }));
+            services.AddCors();
+            services.AddAutoMapper();
+
+            services.AddAuthentication (JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer (options => {
+                    options.TokenValidationParameters = new TokenValidationParameters {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey (Encoding.ASCII
+                    .GetBytes (Configuration.GetSection ("AppSettings:Token").Value)),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                    };
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure (IApplicationBuilder app, IWebHostEnvironment env) {
+        public void Configure (IApplicationBuilder app, IWebHostEnvironment env, Seed seeder) {
             if (env.IsDevelopment ()) {
                 app.UseDeveloperExceptionPage ();
             }
-            // app.UseCors(x => x.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+            else {
+                app.UseExceptionHandler(builder => {
+                    builder.Run(async context => {
+                        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                        var error = context.Features.Get<IExceptionHandlerFeature>();
+                        if (error != null) {
+                            context.Response.AddApplicationError(error.Error.Message);
+                            await context.Response.WriteAsync(error.Error.Message);
+                        }
+                    });
+                });
+            }
+            app.UseCors(x => x.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 
             app.UseHttpsRedirection ();
-
+            // seeder.SeedUsers();
             app.UseRouting ();
-
             app.UseAuthorization ();
 
             app.UseEndpoints (endpoints => {

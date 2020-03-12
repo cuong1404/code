@@ -29,7 +29,8 @@
               "../DatingApp-SPA/node_modules/bootstrap/dist/css/bootstrap.min.css"
             ],
             "scripts": [
-              "../DatingApp-SPA/node_modules/bootstrap/dist/js/bootstrap.js"
+              "../DatingApp-SPA/node_modules/bootstrap/dist/js/bootstrap.js",
+              "../DatingApp-SPA/node_modules/alertifyjs/build/alertify.min.js"
             ]
           },
           "configurations": {
