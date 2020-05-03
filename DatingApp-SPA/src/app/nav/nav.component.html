@@ -14,13 +14,16 @@
       </li>
     </ul>
 
-    <div *ngIf="loggedIn()" class="dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      <a class="dropdown-toggle text-light" >
+    <div *ngIf="loggedIn()" class="dropdown" dropdown>
+      <span class="mr-1">
+        <img src="{{photoUrl}}" alt="">
+      </span>
+      <a class="dropdown-toggle text-light" dropdownToggle>
         Welcome {{authService.decodedToken?.unique_name | titlecase}}
       </a>
 
-      <div class="dropdown-menu mt-3" aria-labelledby="dropdownMenuButton">
-        <a class="dropdown-item" href="#">
+      <div class="dropdown-menu mt-3" *dropdownMenu>
+        <a class="dropdown-item" [routerLink]="['/member/edit']">
           <i class="fa fa-user"></i> Edit Profile</a>
         <div class="dropdown-divider"></div>
         <a class="dropdown-item" (click)="logout()">
@@ -34,6 +37,4 @@
       <button [disabled]="!loginForm.valid" class="btn btn-success my-2 my-sm-0" type="submit">Login</button>
     </form>
   </div>
-
-
 </nav>

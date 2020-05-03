@@ -25,12 +25,10 @@
             "aot": false,
             "assets": ["src/favicon.ico", "src/assets"],
             "styles": [
-              "src/styles.scss",
-              "../DatingApp-SPA/node_modules/bootstrap/dist/css/bootstrap.min.css"
+              "src/styles.scss"
             ],
             "scripts": [
-              "../DatingApp-SPA/node_modules/bootstrap/dist/js/bootstrap.js",
-              "../DatingApp-SPA/node_modules/alertifyjs/build/alertify.min.js"
+              "node_modules/alertifyjs/build/alertify.min.js"
             ]
           },
           "configurations": {

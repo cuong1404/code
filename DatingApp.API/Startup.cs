@@ -44,6 +44,7 @@ namespace DatingApp.API {
             //         .AllowAnyHeader ();
             // }));
             services.AddCors();
+            services.Configure<CloudinarySettings>(Configuration.GetSection("CloudinarySettings"));
             services.AddAutoMapper();
 
             services.AddAuthentication (JwtBearerDefaults.AuthenticationScheme)
