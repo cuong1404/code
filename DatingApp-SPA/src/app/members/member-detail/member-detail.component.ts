@@ -16,11 +16,11 @@ export class MemberDetailComponent implements OnInit {
   galleryImages: NgxGalleryImage[];
 
   constructor(private userService: UserService, private alertify: AlertifyService,
-      private route: ActivatedRoute) { }
+              private route: ActivatedRoute) { }
 
   ngOnInit() {
     this.route.data.subscribe(data => {
-      this.user = data['user'];
+      this.user = data.user;
     });
 
     this.galleryOptions = [
@@ -38,6 +38,7 @@ export class MemberDetailComponent implements OnInit {
 
   getImages() {
     const imageUrls = [];
+    // tslint:disable-next-line: prefer-for-of
     for (let i = 0; i < this.user.photos.length; i++) {
       imageUrls.push({
         small: this.user.photos[i].url,
